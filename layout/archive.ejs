@@ -1,0 +1,31 @@
+<div class="archive-container">
+    <h2 class="archive-title">
+        <% if (is_year()) { %>
+            <%= page.year %> 年
+        <% } else if (is_month()) { %>
+            <%= page.year %> 年 <%= page.month %> 月
+        <% } else { %>
+            文章归档
+        <% } %>
+    </h2>
+
+    <div class="archive-list">
+        <% page.posts.each(function(post) { %>
+            <article class="archive-item">
+                <span class="archive-date"><%= date(post.date, 'YYYY-MM-DD') %></span>
+                <h3 class="archive-post-title">
+                    <a href="<%- url_for(post.path) %>"><%= post.title %></a>
+                </h3>
+            </article>
+        <% }) %>
+    </div>
+
+    <% if (page.total > 1) { %>
+        <nav class="pagination">
+            <%- paginator({
+                prev_text: '上一页',
+                next_text: '下一页'
+            }) %>
+        </nav>
+    <% } %>
+</div>

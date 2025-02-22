@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="<%= config.language %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= config.title %></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <%- css('css/style.css') %>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <a href="<%- url_for('/') %>">
+                    <h1><%= config.title %></h1>
+                </a>
+            </div>
+            
+            <!-- 搜索框 -->
+            <div class="search-box">
+                <input type="text" placeholder="搜索...">
+            </div>
+
+            <!-- 导航菜单 -->
+            <nav class="sidebar-nav">
+                <% for (let i in theme.menu) { %>
+                    <div class="nav-item">
+                        <a href="<%- url_for(theme.menu[i]) %>" class="<%= url_for(theme.menu[i]) === '/' ? 'home-link' : '' %>">
+                            <i class="ri-<%= theme.menu_icons[i] %>"></i>
+                            <%= i %>
+                        </a>
+                    </div>
+                <% } %>
+            </nav>
+        </aside>
+
+        <!-- 主要内容区 -->
+        <main class="main-content">
+            <!-- 设置按钮 -->
+            <div class="settings-toggle">
+                <select class="language-select">
+                    <% theme.languages.forEach(function(lang) { %>
+                        <option value="<%= lang.code %>" <%= config.language === lang.code ? 'selected' : '' %>>
+                            <%= lang.name %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="content-container">
+                <% if (is_post() || is_page()) { %>
+                    <%- body %>
+                <% } else if (page.layout === 'changelog') { %>
+                    <%- partial('changelog') %>
+                <% } else { %>
+                    <%- body %>
+                <% } %>
+            </div>
+        </main>
+
+        <!-- 右侧设置面板 -->
+        <aside class="settings-panel">
+            <div class="settings-panel-inner">
+                <div class="settings-header">
+                    <h3>设置</h3>
+                    <button class="close-settings">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                
+                <!-- 语言切换 -->
+                <div class="settings-section">
+                    <h4>语言</h4>
+                    <select class="language-select">
+                        <% theme.languages.forEach(function(lang) { %>
+                            <option value="<%= lang.code %>" <%= config.language === lang.code ? 'selected' : '' %>>
+                                <%= lang.name %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </div>
+            </div>
+        </aside>
+    </div>
+    <%- js('js/main.js') %>
+</body>
+</html>

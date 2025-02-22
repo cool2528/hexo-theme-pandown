@@ -1,0 +1,28 @@
+<div class="home-page">
+    <h1><%= theme.title %></h1>
+    <p><%= theme.description %></p>
+
+    <!-- 功能特性 -->
+    <div class="feature-grid">
+        <% theme.features.forEach(function(feature) { %>
+            <div class="feature-item">
+                <i class="ri-<%= feature.icon %>"></i>
+                <h3><%= feature.title %></h3>
+                <p><%= feature.desc %></p>
+            </div>
+        <% }) %>
+    </div>
+
+    <!-- 下载区域 -->
+    <div class="download-section">
+        <h2>下载地址</h2>
+        <div class="download-buttons">
+            <a href="<%= theme.download.primary.url %>" class="download-btn primary">
+                <%= theme.download.primary.text %>
+            </a>
+            <a href="<%= theme.download.secondary.url %>" class="download-btn secondary">
+                <%= theme.download.secondary.text %>
+            </a>
+        </div>
+    </div>
+</div>

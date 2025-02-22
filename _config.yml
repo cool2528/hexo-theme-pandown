@@ -1,0 +1,47 @@
+# 主题基本配置
+title: GDownload
+subtitle: 一个简洁的下载工具
+description: 高速下载百度网盘资源
+
+# 导航菜单及图标
+menu:
+  首页: /
+  使用说明: /usage
+  常见问题: /faq
+  更新日志: /changelog
+  关于: /about
+
+menu_icons:
+  首页: home-line
+  使用说明: file-text-line
+  常见问题: question-line
+  更新日志: history-line
+  关于: information-line
+
+# 下载链接
+download:
+  primary:
+    text: 本地下载
+    url: '#'
+  secondary:
+    text: 备用下载
+    url: '#'
+
+# 功能特性
+features:
+  - icon: cloud-line
+    title: 高速下载
+    desc: 支持多线程下载，速度更快
+  - icon: folder-line
+    title: 文件管理
+    desc: 支持多账号登录、文件管理
+  - icon: search-line
+    title: 资源搜索
+    desc: 一键搜索网盘资源
+
+# 语言设置
+languages:
+  - name: 简体中文
+    code: zh-CN
+  - name: English
+    code: en
