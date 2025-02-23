@@ -1,88 +1,117 @@
 <!DOCTYPE html>
 <html lang="<%= config.language %>">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= config.title %></title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
-    <%- css('css/style.css') %>
+    <title data-i18n="home.title">GDownload</title>
+    <!-- 移除原有的CDN引用 -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css"> -->
+    <link rel="stylesheet" href="<%- url_for('css/style.css') %>">
+    <!-- 添加CDN容错脚本 -->
+    <script src="<%- url_for('js/cdn-fallback.js') %>"></script>
+    <!-- 添加主题初始化脚本 -->
+    <script>
+        // 初始化主题
+        (function () {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const root = document.documentElement;
+
+            if (savedTheme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                root.classList.add(`theme-${prefersDark ? 'dark' : 'light'}`);
+            } else {
+                root.classList.add(`theme-${savedTheme}`);
+            }
+        })();
+    </script>
 </head>
+
 <body>
     <div class="app-container">
         <!-- 左侧边栏 -->
         <aside class="sidebar">
             <div class="sidebar-logo">
                 <a href="<%- url_for('/') %>">
-                    <h1><%= config.title %></h1>
+                    <h1 data-i18n="home.title">GDownload</h1>
                 </a>
             </div>
-            
+
             <!-- 搜索框 -->
             <div class="search-box">
-                <input type="text" placeholder="搜索...">
+                <input type="text" data-i18n="search.placeholder" placeholder="搜索...">
             </div>
 
             <!-- 导航菜单 -->
             <nav class="sidebar-nav">
-                <% for (let i in theme.menu) { %>
-                    <div class="nav-item">
-                        <a href="<%- url_for(theme.menu[i]) %>" class="<%= url_for(theme.menu[i]) === '/' ? 'home-link' : '' %>">
-                            <i class="ri-<%= theme.menu_icons[i] %>"></i>
-                            <%= i %>
-                        </a>
-                    </div>
-                <% } %>
+                <a href="<%= url_for(page.lang === 'en' ? '/en/' : '/') %>" class="nav-item">
+                    <i class="ri-home-line"></i>
+                    <span>
+                        <%= page.lang==='en' ? 'Home' : '首页' %>
+                    </span>
+                </a>
+                <a href="<%= url_for(page.lang === 'en' ? '/en/usage' : '/usage') %>" class="nav-item">
+                    <i class="ri-file-text-line"></i>
+                    <span>
+                        <%= page.lang==='en' ? 'Usage' : '使用说明' %>
+                    </span>
+                </a>
+                <a href="<%= url_for(page.lang === 'en' ? '/en/faq' : '/faq') %>" class="nav-item">
+                    <i class="ri-question-line"></i>
+                    <span>
+                        <%= page.lang==='en' ? 'FAQ' : '常见问题' %>
+                    </span>
+                </a>
+                <a href="<%= url_for(page.lang === 'en' ? '/en/changelog' : '/changelog') %>" class="nav-item">
+                    <i class="ri-history-line"></i>
+                    <span>
+                        <%= page.lang==='en' ? 'Changelog' : '更新日志' %>
+                    </span>
+                </a>
+                <a href="<%= url_for(page.lang === 'en' ? '/en/about' : '/about') %>" class="nav-item">
+                    <i class="ri-information-line"></i>
+                    <span>
+                        <%= page.lang==='en' ? 'About' : '关于' %>
+                    </span>
+                </a>
             </nav>
         </aside>
 
-        <!-- 主要内容区 -->
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <!-- 语言切换下拉菜单 -->
+            <div class="language-dropdown">
+                <button class="language-btn" id="languageBtn">
+                    <i class="ri-global-line"></i>
+                    <span class="current-lang">
+                        <%= page.lang==='en' ? 'English' : '简体中文' %>
+                    </span>
+                </button>
+                <div class="language-menu" id="languageMenu">
+                    <a href="#" data-lang="zh-CN" <%=page.lang==='zh-CN' ? 'class="active"' : '' %>>简体中文</a>
+                    <a href="#" data-lang="en" <%=page.lang==='en' ? 'class="active"' : '' %>>English</a>
+                </div>
+            </div>
+
+            <!-- 主题切换开关 -->
+            <div class="theme-switch">
+                <input type="checkbox" id="themeToggle" class="theme-checkbox">
+                <label for="themeToggle" class="theme-label">
+                    <i class="ri-sun-line light-icon"></i>
+                    <i class="ri-moon-line dark-icon"></i>
+                    <span class="toggle-ball"></span>
+                </label>
+            </div>
+        </div>
+
         <main class="main-content">
-            <!-- 设置按钮 -->
-            <div class="settings-toggle">
-                <select class="language-select">
-                    <% theme.languages.forEach(function(lang) { %>
-                        <option value="<%= lang.code %>" <%= config.language === lang.code ? 'selected' : '' %>>
-                            <%= lang.name %>
-                        </option>
-                    <% }) %>
-                </select>
-            </div>
-
-            <div class="content-container">
-                <% if (is_post() || is_page()) { %>
-                    <%- body %>
-                <% } else if (page.layout === 'changelog') { %>
-                    <%- partial('changelog') %>
-                <% } else { %>
-                    <%- body %>
-                <% } %>
-            </div>
+            <%- body %>
         </main>
-
-        <!-- 右侧设置面板 -->
-        <aside class="settings-panel">
-            <div class="settings-panel-inner">
-                <div class="settings-header">
-                    <h3>设置</h3>
-                    <button class="close-settings">
-                        <i class="ri-close-line"></i>
-                    </button>
-                </div>
-                
-                <!-- 语言切换 -->
-                <div class="settings-section">
-                    <h4>语言</h4>
-                    <select class="language-select">
-                        <% theme.languages.forEach(function(lang) { %>
-                            <option value="<%= lang.code %>" <%= config.language === lang.code ? 'selected' : '' %>>
-                                <%= lang.name %>
-                            </option>
-                        <% }) %>
-                    </select>
-                </div>
-            </div>
-        </aside>
+        <!-- 提示消息容器 -->
+        <div class="toast-container" id="toastContainer"></div>
     </div>
-    <%- js('js/main.js') %>
+
+    <script src="<%- url_for('js/main.js') %>" type="module"></script>
 </body>
+
 </html>

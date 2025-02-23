@@ -1,7 +1,8 @@
 # 主题基本配置
+
 title: GDownload
 subtitle: 一个简洁的下载工具
-description: 高速下载百度网盘资源
+description: 基于aria2的多线程下载工具
 
 # 导航菜单及图标
 menu:
@@ -20,12 +21,21 @@ menu_icons:
 
 # 下载链接
 download:
-  primary:
-    text: 本地下载
-    url: '#'
-  secondary:
-    text: 备用下载
-    url: '#'
+  windows:
+    text: Windows
+    url: 'https://dldir1v6.qq.com/weixin/Windows/WeChatSetup.exe'
+    icon: windows-line
+    version: v1.2.0
+  macos:
+    text: macOS
+    url: 'https://dldir1.qq.com/weixin/mac/WeChatMac.dmg'
+    icon: apple-line
+    version: v1.2.0
+  linux:
+    text: Linux
+    url: 'https://dldir1v6.qq.com/weixin/Universal/Linux/WeChatLinux_x86_64.deb'
+    icon: ubuntu-line
+    version: v1.2.0
 
 # 功能特性
 features:
@@ -45,3 +55,9 @@ languages:
     code: zh-CN
   - name: English
     code: en
+
+# CDN 配置
+cdn:
+  remixicon:
+    - https://cdn.staticfile.org/remixicon/3.5.0/remixicon.css
+    - https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css

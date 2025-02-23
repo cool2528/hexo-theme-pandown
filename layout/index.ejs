@@ -1,28 +1,62 @@
-<div class="home-page">
-    <h1><%= theme.title %></h1>
-    <p><%= theme.description %></p>
-
-    <!-- 功能特性 -->
-    <div class="feature-grid">
-        <% theme.features.forEach(function(feature) { %>
-            <div class="feature-item">
-                <i class="ri-<%= feature.icon %>"></i>
-                <h3><%= feature.title %></h3>
-                <p><%= feature.desc %></p>
-            </div>
-        <% }) %>
-    </div>
-
-    <!-- 下载区域 -->
-    <div class="download-section">
-        <h2>下载地址</h2>
-        <div class="download-buttons">
-            <a href="<%= theme.download.primary.url %>" class="download-btn primary">
-                <%= theme.download.primary.text %>
-            </a>
-            <a href="<%= theme.download.secondary.url %>" class="download-btn secondary">
-                <%= theme.download.secondary.text %>
-            </a>
+<div class="home-content">
+    <section class="header-section">
+        <h1 class="site-title">GDownload</h1>
+        <p class="site-description">基于aria2的多线程下载工具</p>
+    </section>
+    
+    <section class="download-section">
+        <h2><%= page.lang === 'en' ? 'Download' : '下载地址' %></h2>
+        <div class="platform-downloads">
+            <% for (const [platform, info] of Object.entries(theme.download)) { %>
+                <% if (['windows', 'macos', 'linux'].includes(platform)) { %>
+                    <a href="<%= info.url %>" class="download-btn platform">
+                        <i class="ri-<%= info.icon %>"></i>
+                        <div class="platform-info">
+                            <span class="platform-name"><%= info.text %></span>
+                            <span class="version"><%= info.version || 'v1.0.0' %></span>
+                        </div>
+                    </a>
+                <% } %>
+            <% } %>
         </div>
-    </div>
+    </section>
+
+    <section class="features-section">
+        <div class="feature-grid">
+            <div class="feature-item">
+                <i class="ri-download-cloud-2-line"></i>
+                <% if (page.lang === 'en') { %>
+                    <h3>Aria2 Engine</h3>
+                    <p>Powered by aria2 multi-thread download engine</p>
+                <% } else { %>
+                    <h3>Aria2引擎</h3>
+                    <p>基于aria2引擎,支持多线程高速下载</p>
+                <% } %>
+            </div>
+            
+            <div class="feature-item">
+                <i class="ri-hard-drive-2-line"></i>
+                <% if (page.lang === 'en') { %>
+                    <h3>Cloud Drive Support</h3>
+                    <p>Support various cloud drive downloads</p>
+                <% } else { %>
+                    <h3>网盘支持</h3>
+                    <p>支持各大网盘插件下载任务</p>
+                <% } %>
+            </div>
+            
+            <div class="feature-item">
+                <i class="ri-chrome-line"></i>
+                <% if (page.lang === 'en') { %>
+                    <h3>Browser Extension</h3>
+                    <p>Download with browser extension support</p>
+                <% } else { %>
+                    <h3>浏览器插件</h3>
+                    <p>配合浏览器插件实现下载任务接管</p>
+                <% } %>
+            </div>
+        </div>
+    </section>
+    
+
 </div>

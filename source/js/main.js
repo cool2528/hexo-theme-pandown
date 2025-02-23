@@ -1,8 +1,12 @@
+// 导入模块
+import { Search } from './modules/search.js';
+import { translations } from './modules/translations.js';
+
 // 平滑滚动
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
+        document.querySelector(this.getAttribute('href'))?.scrollIntoView({
             behavior: 'smooth'
         });
     });
@@ -18,36 +22,6 @@ const toggleMenu = () => {
 const toggleSidebar = () => {
   document.body.classList.toggle('sidebar-open');
 };
-
-// 设置面板控制
-const settingsBtn = document.getElementById('settingsBtn');
-const settingsPanel = document.querySelector('.settings-panel');
-const closeSettings = document.querySelector('.close-settings');
-
-settingsBtn.addEventListener('click', () => {
-  settingsPanel.classList.add('active');
-});
-
-closeSettings.addEventListener('click', () => {
-  settingsPanel.classList.remove('active');
-});
-
-// 点击面板外关闭设置
-document.addEventListener('click', (e) => {
-  if (!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
-    settingsPanel.classList.remove('active');
-  }
-});
-
-// 语言切换
-const languageSelect = document.querySelector('.language-select');
-if (languageSelect) {
-  languageSelect.addEventListener('change', (e) => {
-    const lang = e.target.value;
-    // 实现语言切换逻辑
-    window.location.href = `/${lang}${window.location.pathname}`;
-  });
-}
 
 // 搜索功能
 const searchBox = document.querySelector('.search-box input');
@@ -67,130 +41,164 @@ const handleResize = () => {
 
 window.addEventListener('resize', handleResize);
 
-// 页面加载动画
+// 主题切换
+function initTheme() {
+    const themeToggle = document.getElementById('themeToggle');
+    if (!themeToggle) {
+        console.warn('主题切换按钮未找到');
+        return;
+    }
+    
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const root = document.documentElement;
+    
+    // 初始化主题
+    root.classList.add(`theme-${savedTheme}`);
+    themeToggle.checked = savedTheme === 'dark';
+    
+    // 绑定切换事件
+    themeToggle.addEventListener('change', (e) => {
+        const theme = e.target.checked ? 'dark' : 'light';
+        root.classList.remove('theme-light', 'theme-dark');
+        root.classList.add(`theme-${theme}`);
+        localStorage.setItem('theme', theme);
+        
+        // 添加调试日志
+        console.log('主题切换:', theme);
+    });
+}
+
+// 更新语言切换路径逻辑
+function updateLanguagePath(path, lang) {
+    // 移除当前路径中的语言前缀
+    path = path.replace(/^\/[a-z]{2}-[A-Z]{2}\//, '/');
+    path = path.replace(/^\/[a-z]{2}\//, '/');
+    
+    // 如果选择的不是默认语言，添加语言前缀
+    if (lang !== 'zh-CN') {
+        path = `/${lang}${path}`;
+    }
+    
+    return path;
+}
+
+// 保留这个更完整的initLanguage函数
+function initLanguage() {
+    const languageBtn = document.getElementById('languageBtn');
+    const languageMenu = document.getElementById('languageMenu');
+    
+    if (!languageBtn || !languageMenu) {
+        console.warn('语言切换元素未找到');
+        return;
+    }
+    
+    // 切换菜单显示
+    languageBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        languageMenu.style.display = languageMenu.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // 点击其他地方关闭菜单
+    document.addEventListener('click', () => {
+        languageMenu.style.display = 'none';
+    });
+    
+    // 语言切换处理
+    languageMenu.addEventListener('click', (e) => {
+        const target = e.target;
+        if (target.tagName === 'A') {
+            e.preventDefault();
+            const lang = target.dataset.lang;
+            const currentPath = window.location.pathname;
+            const newPath = updateLanguagePath(currentPath, lang);
+            localStorage.setItem('lang', lang);
+            window.location.href = newPath;
+        }
+    });
+}
+
+// 只保留一个初始化入口
 document.addEventListener('DOMContentLoaded', () => {
-    document.body.classList.add('loaded');
+    try {
+        // 初始化搜索
+        const search = new Search();
+        
+        // 初始化主题和语言
+        initTheme();
+        initLanguage();
+        
+        // 添加页面加载动画
+        document.body.classList.add('loaded');
+        
+        // 响应式处理
+        handleResize();
+    } catch (error) {
+        console.error('初始化失败:', error);
+    }
 });
 
-// 搜索功能
-class Search {
+// 建议将所有功能模块化，使用 ES6 模块系统
+export class Navigation {
     constructor() {
-        this.searchBox = document.querySelector('.search-box input');
-        this.searchResults = document.querySelector('.search-results');
-        this.searchData = null;
-        this.bindEvents();
+        this.init();
     }
-
-    bindEvents() {
-        if (!this.searchBox) return;
-
-        this.searchBox.addEventListener('input', this.debounce(() => {
-            this.performSearch(this.searchBox.value);
-        }, 300));
-
-        // 点击外部关闭搜索结果
-        document.addEventListener('click', (e) => {
-            if (!this.searchBox.contains(e.target) && !this.searchResults?.contains(e.target)) {
-                this.searchResults?.classList.remove('active');
-            }
+    
+    init() {
+        this.setupSmoothScroll();
+        this.setupResponsiveMenu();
+    }
+    
+    setupSmoothScroll() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
         });
-    }
-
-    async performSearch(query) {
-        if (!query) {
-            this.searchResults?.classList.remove('active');
-            return;
-        }
-
-        if (!this.searchData) {
-            try {
-                const response = await fetch('/search.json');
-                this.searchData = await response.json();
-            } catch (error) {
-                console.error('Failed to load search data:', error);
-                return;
-            }
-        }
-
-        const results = this.searchData.filter(item => 
-            item.title.toLowerCase().includes(query.toLowerCase()) ||
-            item.content.toLowerCase().includes(query.toLowerCase())
-        ).slice(0, 5);
-
-        this.renderResults(results);
-    }
-
-    renderResults(results) {
-        if (!this.searchResults) return;
-
-        if (results.length === 0) {
-            this.searchResults.innerHTML = '<div class="search-result-item">无搜索结果</div>';
-        } else {
-            this.searchResults.innerHTML = results.map(result => `
-                <div class="search-result-item">
-                    <a href="${result.url}">
-                        <div class="result-title">${result.title}</div>
-                        <div class="result-preview">${this.truncate(result.content, 100)}</div>
-                    </a>
-                </div>
-            `).join('');
-        }
-
-        this.searchResults.classList.add('active');
-    }
-
-    truncate(text, length) {
-        return text.length > length ? text.substring(0, length) + '...' : text;
-    }
-
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
     }
 }
 
-// 设置面板
-class SettingsPanel {
-    constructor() {
-        this.settingsBtn = document.getElementById('settingsBtn');
-        this.settingsPanel = document.querySelector('.settings-panel');
-        this.closeBtn = document.querySelector('.close-settings');
-        this.languageSelect = document.querySelector('.language-select');
-        this.bindEvents();
-    }
-
-    bindEvents() {
-        if (!this.settingsBtn || !this.settingsPanel) return;
-
-        this.settingsBtn.addEventListener('click', () => {
-            this.settingsPanel.classList.add('active');
-        });
-
-        this.closeBtn?.addEventListener('click', () => {
-            this.settingsPanel.classList.remove('active');
-        });
-
-        this.languageSelect?.addEventListener('change', (e) => {
-            const lang = e.target.value;
-            window.location.href = `/${lang}${window.location.pathname}`;
-        });
-
-        // 点击外部关闭设置面板
-        document.addEventListener('click', (e) => {
-            if (!this.settingsPanel.contains(e.target) && !this.settingsBtn.contains(e.target)) {
-                this.settingsPanel.classList.remove('active');
+// 语言切换
+function initLanguageDropdown() {
+    const languageBtn = document.getElementById('languageBtn');
+    const languageMenu = document.getElementById('languageMenu');
+    
+    // 切换菜单显示
+    languageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        languageMenu.classList.toggle('active');
+    });
+    
+    // 点击其他地方关闭菜单
+    document.addEventListener('click', () => {
+        languageMenu.classList.remove('active');
+    });
+    
+    // 语言切换处理
+    languageMenu.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A') {
+            e.preventDefault();
+            const lang = e.target.dataset.lang;
+            const currentPath = window.location.pathname;
+            
+            let newPath = currentPath.replace(/^\/[a-z]{2}-[A-Z]{2}\//, '/');
+            newPath = newPath.replace(/^\/[a-z]{2}\//, '/');
+            
+            if (lang !== 'zh-CN') {
+                newPath = `/${lang}${newPath}`;
             }
-        });
-    }
+            
+            localStorage.setItem('lang', lang);
+            window.location.href = newPath;
+        }
+    });
 }
 
 // 初始化
-new Search();
-new SettingsPanel(); 
+document.addEventListener('DOMContentLoaded', () => {
+    initLanguageDropdown();
+}); 

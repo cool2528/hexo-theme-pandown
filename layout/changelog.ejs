@@ -1,27 +1,19 @@
-<div class="changelog-container">
-    <h1 class="page-title">更新日志</h1>
-    <div class="changelog-list">
-        <% 
-        var posts = [];
-        site.posts.each(function(post) {
-            posts.push(post);
-        });
-        posts.sort(function(a, b) {
-            return b.date - a.date;
-        });
-        posts.forEach(function(post) { 
-        %>
-            <article class="changelog-item">
-                <div class="changelog-header">
-                    <h2 class="changelog-version">
-                        <a href="<%- url_for(post.path) %>"><%= post.title %></a>
-                    </h2>
-                    <time class="changelog-date"><%= date(post.date, 'YYYY-MM-DD') %></time>
+<div class="changelog-page">
+    <h1 data-i18n="changelog.title">更新日志</h1>
+    
+    <div class="changelog-content">
+        <div class="version-list">
+            <% site.posts.sort('date', -1).each(function(post) { %>
+                <div class="version-item">
+                    <div class="version-header">
+                        <h2><%= post.title %></h2>
+                        <span class="version-date"><%= date(post.date, 'YYYY-MM-DD') %></span>
+                    </div>
+                    <div class="version-changes">
+                        <%- post.content %>
+                    </div>
                 </div>
-                <div class="changelog-content">
-                    <%- post.content %>
-                </div>
-            </article>
-        <% }); %>
+            <% }) %>
+        </div>
     </div>
 </div> 
